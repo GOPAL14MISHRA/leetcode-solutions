@@ -9,16 +9,27 @@ class Solution {
             for(int j=i;j<n;j++){
                product*=nums[j];
                gcd=findGcd(gcd,nums[j]);
-               lcm = (lcm / findGcd(lcm, nums[j])) * nums[j];
+               lcm = findlcm(lcm, nums[j]);
                if(product==(gcd*lcm)){
                 maxLen=Math.max(maxLen,(j-i+1));
                }
+               if (product > 1e18) {
+                    break;
+                }
             }
         }
         return maxLen;
     }
     private long findGcd(long a,long b){
-        if(b==0)return a;
-        return findGcd(b,a%b);
+        while (b != 0) {
+            long temp = b;
+            b = a % b;
+            a = temp;
+        }
+        return a;
+    }
+    private long findlcm(long a, long b) {
+        if (a == 0 || b == 0) return 0;
+        return (a / findGcd(a, b)) * b;
     }
 }
