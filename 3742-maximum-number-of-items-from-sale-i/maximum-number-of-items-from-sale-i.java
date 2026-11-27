@@ -3,10 +3,7 @@ class Solution {
         int n = items.length;
         int cheapestItem = Integer.MAX_VALUE;
         int[] copies = new int[n];
-        int[][] memo = new int[n + 1][budget + 1];
-        for (int[] row : memo) {
-            Arrays.fill(row, -1);
-        }
+
         for (int i = 0; i < n; i++) {
             cheapestItem = Math.min(cheapestItem, items[i][1]);
             int copy = 0;
@@ -19,24 +16,23 @@ class Solution {
             }
             copies[i] = copy;
         }
-        return solve(n, budget, items, copies, cheapestItem,memo);
+        int[][] dp = new int[n + 1][budget + 1];
+        //base case
 
-    }
-
-    private int solve(int n, int budget, int[][] items, int[] copies, int cheapestItem,int[][] memo) {
-        if (n == 0) {
-            return budget / cheapestItem;
+        for (int b = 0; b <= budget; b++) {
+            dp[0][b] = b / cheapestItem;
         }
-        if (memo[n][budget] != -1) {
-            return memo[n][budget];
+        for (int i = 1; i <= n; i++) {
+            for (int j = 0; j <= budget; j++) {
+                int skip = dp[i - 1][j];
+                int take = 0;
+                int price = items[i - 1][1];
+                if (price <= j) {
+                 take = 1 + copies[i - 1] + dp[i - 1][j - price];
+                }
+                dp[i][j] = Math.max(skip, take);
+            }
         }
-        int take = 0;
-        int skip = 0;
-        int price = items[n - 1][1];
-        if (price <= budget) {
-            take = 1 + copies[n - 1] + solve(n - 1, budget - price, items, copies, cheapestItem,memo);
-        }
-        skip = solve(n - 1, budget, items, copies, cheapestItem,memo);
-        return memo[n][budget] = Math.max(skip, take);
+        return dp[n][budget];
     }
 }
